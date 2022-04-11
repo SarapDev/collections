@@ -1,16 +1,15 @@
 {
-    "name": "illuminate/collections",
-    "description": "The Illuminate Collections package.",
+    "name": "sarapdev/type_hint_collections",
+    "description": "The Type hinted Illuminate Collections package.",
     "license": "MIT",
-    "homepage": "https://laravel.com",
-    "support": {
-        "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
-    },
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
+        },
+        {
+            "name": "Mikhail Sarapulov",
+            "email": "miha.sarapulov@gmail.com"
         }
     ],
     "require": {

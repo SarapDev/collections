@@ -10,12 +10,13 @@ if (! function_exists('collect')) {
      * @template TKey of array-key
      * @template TValue
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $value
+     * @param string $type
+     * @param \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|null $value
      * @return \Illuminate\Support\Collection<TKey, TValue>
      */
-    function collect($value = null)
+    function collect(string $type, mixed $value = null): Collection
     {
-        return new Collection($value);
+        return new Collection($type, $value);
     }
 }
 

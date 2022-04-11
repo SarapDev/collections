@@ -5,6 +5,9 @@ namespace Illuminate\Support;
 use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
+use Illuminate\Support\Exceptions\ItemNotFoundException;
+use Illuminate\Support\Exceptions\MultipleItemsFoundException;
+use Illuminate\Support\Exceptions\WrongItemTypeException;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use stdClass;
@@ -31,14 +34,30 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     protected $items = [];
 
+    protected string $type;
+
     /**
      * Create a new collection.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $items
      * @return void
      */
-    public function __construct($items = [])
+    public function __construct(string $type, $items = [])
     {
+        $this->type = $type;
+
+        if (count($items) > 0 ) {
+            $arrKey = array_key_first($items);
+
+            if(!($items[$arrKey] instanceof $this->type)) {
+                throw new WrongItemTypeException('Wrong item type');
+            }
+            $itemType = gettype($items[$arrKey]);
+            if (!($itemType === $this->type)) {
+                throw new WrongItemTypeException('Wrong item type. Get '.$itemType.'. Must be '.$this->type.'.');
+            }
+        }
+
         $this->items = $this->getArrayableItems($items);
     }
 
@@ -51,7 +70,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public static function range($from, $to)
     {
-        return new static(range($from, $to));
+        return new static('integer', range($from, $to));
     }
 
     /**
@@ -1205,8 +1224,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @param  mixed  $value
      * @return TValue
      *
-     * @throws \Illuminate\Support\ItemNotFoundException
-     * @throws \Illuminate\Support\MultipleItemsFoundException
+     * @throws \Illuminate\Support\Exceptions\ItemNotFoundException
+     * @throws \Illuminate\Support\Exceptions\MultipleItemsFoundException
      */
     public function sole($key = null, $operator = null, $value = null)
     {
@@ -1237,7 +1256,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @param  mixed  $value
      * @return TValue
      *
-     * @throws \Illuminate\Support\ItemNotFoundException
+     * @throws \Illuminate\Support\Exceptions\ItemNotFoundException
      */
     public function firstOrFail($key = null, $operator = null, $value = null)
     {
@@ -1708,5 +1727,15 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function offsetUnset($key): void
     {
         unset($this->items[$key]);
+    }
+
+    public function when($value, callable $callback = null, callable $default = null)
+    {
+        // TODO: Implement when() method.
+    }
+
+    public function unless($value, callable $callback, callable $default = null)
+    {
+        // TODO: Implement unless() method.
     }
 }
